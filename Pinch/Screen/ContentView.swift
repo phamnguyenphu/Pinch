@@ -28,6 +28,8 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+                Color.clear
+
                 // MARK: - PAGE IMAGE
 
                 Image("magazine-front-cover")
@@ -69,6 +71,12 @@ struct ContentView: View {
                             }
                     )
             } //: Zstack
+            .overlay(
+                InfoPanelView(scale: imageScale, offset: imageOffset)
+                    .padding(.horizontal)
+                    .padding(.top, 30),
+                alignment: .top
+            )
             .navigationTitle("Pinch & Zoom")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
