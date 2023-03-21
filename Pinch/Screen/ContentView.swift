@@ -70,9 +70,33 @@ struct ContentView: View {
                                 }
                             }
                     )
+                
+                    // MARK: - 3. MAGNIFICATION GESTURE
+
+                    .gesture(
+                        MagnificationGesture()
+                            .onChanged { value in
+                                withAnimation(.linear(duration: 1)) {
+                                    if imageScale >= 1, imageScale <= 5, value <= 5.1 {
+                                        imageScale = value
+                                    }
+                                    else if imageScale > 5 {
+                                        imageScale = 5
+                                    }
+                                }
+                            }
+                            .onEnded { _ in
+                                if imageScale <= 1 {
+                                    resetImageState()
+                                }
+                                else if imageScale > 5 {
+                                    imageScale = 5
+                                }
+                            }
+                    )
             } //: Zstack
             
-            // MARK: - 3. INFO PANEL
+            // MARK: INFO PANEL
             
             .overlay(
                 InfoPanelView(scale: imageScale, offset: imageOffset)
@@ -81,7 +105,7 @@ struct ContentView: View {
                 alignment: .top
             )
             
-            // MARK: - 4. CONTROLS
+            // MARK: CONTROLS
             
             .overlay(
                 Group {
