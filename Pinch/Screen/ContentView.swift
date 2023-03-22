@@ -14,9 +14,10 @@ struct ContentView: View {
     @State private var imageScale: CGFloat = 1
     @State private var imageOffset: CGSize = .zero
     @State private var isDrawerOpen: Bool = false
+    @State private var endDragOffset: CGSize = .zero
     
     let pages: [Page] = pagesData
-    @State private var pageIndex: Int = 1
+    @State private var pageIndex: Int = 0
     
     // MARK: - FUNCTION
     
@@ -24,6 +25,7 @@ struct ContentView: View {
         return withAnimation(.spring()) {
             imageScale = 1
             imageOffset = .zero
+            endDragOffset = .zero
         }
     }
     
@@ -69,15 +71,16 @@ struct ContentView: View {
                         DragGesture()
                             .onChanged { value in
                                 withAnimation(.linear(duration: 1)) {
-                                    imageOffset = value.translation
-                                    //                                    imageOffset.width = value.translation.width / 1.25
-                                    //                                    imageOffset.height = value.translation.height / 1.25
+                                    // imageOffset = value.translation
+                                    imageOffset = CGSize(width: value.translation.width / 1.05 + endDragOffset.width, height: value.translation.height / 1.05 + endDragOffset.height)
                                 }
                             }
-                            .onEnded { _ in
-                                // imageOffset = value.translation
+                            .onEnded { value in
                                 if imageScale <= 1 {
                                     resetImageState()
+                                }
+                                else {
+                                    endDragOffset = CGSize(width: value.translation.width / 1.05 + endDragOffset.width, height: value.translation.height / 1.05 + endDragOffset.height)
                                 }
                             }
                     )
@@ -204,6 +207,8 @@ struct ContentView: View {
                             .onTapGesture {
                                 withAnimation(.linear(duration: 0.5)) {
                                     pageIndex = page.id
+                                    resetImageState()
+                                    isDrawerOpen.toggle()
                                 }
                             }
                     }
