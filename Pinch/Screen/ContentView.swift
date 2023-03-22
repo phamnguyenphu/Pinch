@@ -15,6 +15,9 @@ struct ContentView: View {
     @State private var imageOffset: CGSize = .zero
     @State private var isDrawerOpen: Bool = false
     
+    let pages: [Page] = pagesData
+    @State private var pageIndex: Int = 1
+    
     // MARK: - FUNCTION
     
     func resetImageState() {
@@ -22,6 +25,10 @@ struct ContentView: View {
             imageScale = 1
             imageOffset = .zero
         }
+    }
+    
+    func currentPage() -> String {
+        return pages[pageIndex].imageName
     }
     
     // MARK: - CONTENT
@@ -33,7 +40,7 @@ struct ContentView: View {
                 
                 // MARK: - PAGE IMAGE
                 
-                Image("magazine-front-cover")
+                Image(currentPage())
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .cornerRadius(10)
@@ -43,7 +50,7 @@ struct ContentView: View {
                     .offset(x: imageOffset.width, y: imageOffset.height)
                     .scaleEffect(imageScale)
                 
-                // MARK: - 1. TAP GESTURE
+                    // MARK: - 1. TAP GESTURE
                 
                     .onTapGesture(count: 2) {
                         if imageScale == 1 {
@@ -56,23 +63,26 @@ struct ContentView: View {
                         }
                     }
                 
-                // MARK: - 2. DRAG GESTURE
+                    // MARK: - 2. DRAG GESTURE
                 
                     .gesture(
                         DragGesture()
                             .onChanged { value in
                                 withAnimation(.linear(duration: 1)) {
                                     imageOffset = value.translation
+                                    //                                    imageOffset.width = value.translation.width / 1.25
+                                    //                                    imageOffset.height = value.translation.height / 1.25
                                 }
                             }
                             .onEnded { _ in
+                                // imageOffset = value.translation
                                 if imageScale <= 1 {
                                     resetImageState()
                                 }
                             }
                     )
                 
-                // MARK: - 3. MAGNIFICATION GESTURE
+                    // MARK: - 3. MAGNIFICATION GESTURE
                 
                     .gesture(
                         MagnificationGesture()
@@ -155,7 +165,7 @@ struct ContentView: View {
                     .cornerRadius(12)
                     .opacity(isAnimating ? 1 : 0)
                 }
-                    .padding(.bottom, 30),
+                .padding(.bottom, 30),
                 
                 alignment: .bottom
             )
@@ -181,14 +191,31 @@ struct ContentView: View {
                     // MARK: - THUMBNAILS
                     
                     Spacer()
+                    
+                    ForEach(pages) { page in
+                        Image(page.thumbnailsName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 80)
+                            .cornerRadius(8)
+                            .shadow(radius: 4)
+                            .opacity(isDrawerOpen ? 1 : 0)
+                            .animation(.easeOut(duration: 0.5), value: isDrawerOpen)
+                            .onTapGesture {
+                                withAnimation(.linear(duration: 0.5)) {
+                                    pageIndex = page.id
+                                }
+                            }
+                    }
+                    Spacer()
                 }
-                    .padding(EdgeInsets(top: 16, leading: 8, bottom: 16, trailing: 8))
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(12)
-                    .opacity(isAnimating ? 1 : 0)
-                    .frame(width: 260)
-                    .padding(.top, UIScreen.main.bounds.height / 12)
-                    .offset(x: isDrawerOpen ? 20 : 215),
+                .padding(EdgeInsets(top: 16, leading: 8, bottom: 16, trailing: 8))
+                .background(.ultraThinMaterial)
+                .cornerRadius(12)
+                .opacity(isAnimating ? 1 : 0)
+                .frame(width: 260)
+                .padding(.top, UIScreen.main.bounds.height / 12)
+                .offset(x: isDrawerOpen ? 20 : 215),
                 alignment: .topTrailing
             )
             
