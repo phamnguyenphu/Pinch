@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct InfoPanelView: View {
     var scale: CGFloat
     var offset: CGSize
